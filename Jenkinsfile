@@ -15,25 +15,36 @@ pipeline {
             }
         }
 
-        stage('Build') {
+        stage('Build & Test') {
             steps {
                 sh 'npm run build'
-            }
-        }
-
-        stage('Test') {
-            steps {
                 sh 'npm test'
             }
         }
-    }
 
+        stage('Build Docker Images') {
+            steps {
+                sh 'docker build -t cicd-node-app:${BUILD_NUMBER}.'
+            }
+        }
+
+        stage('Run Docker Container') {
+            steps {
+                sh '''
+                docker rm -f cicd-pipeline || true
+                docker run -d -p 3000:3000 --name cicd-pipeline cicd-node-app:${BUILD_NUMBER}
+                '''
+            }
+        }
+    }
+    
     post {
         success {
-            echo 'CI pipeline completed successfully'
+            echo 'Application deployed successfully using Docker'
         }
         failure {
-            echo 'CI pipeline failed'
+            echo 'pipeline failed'
         }
+        
     }
 }
