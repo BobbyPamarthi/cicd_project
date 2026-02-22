@@ -24,7 +24,7 @@ pipeline {
 
         stage('Build Docker Images') {
             steps {
-                sh 'docker build -t cicd-node-app:${BUILD_NUMBER}.'
+                sh 'docker build -t cicd-node-app:${BUILD_NUMBER} .'
             }
         }
 
